@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="ping_get-health"
+		doc:id="a54e7d6d-60c9-4d58-9a42-40855e767c6a">
+		<set-variable
+			value='#[attributes.queryParams.checkDependencies == "true" default false]'
+			doc:name="checkDependencies"
+			doc:id="bffeb0c6-510d-4e08-a4e0-1269803604ec"
+			variableName="checkDependencies" />
+		<choice doc:name="Choice for check dependencies"
+			doc:id="245af207-4b50-47d8-ac4d-87e6f48301fc">
+			<when expression="#[vars.checkDependencies]">
+				<flow-ref doc:name="ping_check-dependencies"
+					doc:id="ba480201-c8d2-4ce9-8729-6e106320e45d"
+					name="ping_check-dependencies" target="dependencyList" />
+			</when>
+			<otherwise>
+				<set-variable doc:name="dependencyList"
+					doc:id="67da54ed-1bf9-40f6-bbe6-41162a3e37f6"
+					variableName="dependencyList" value="#[null]" />
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Map Response"
+			doc:id="38321d86-8900-4b73-8db9-bb47908f4faf">
+			<ee:message>
+				<ee:set-payload resource="dwl/ping-map-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable value="200" doc:name="httpStatus"
+			doc:id="d1a76d34-db2f-4094-8e05-0100b67eb042"
+			variableName="httpStatus" />
+	</sub-flow>
+	<sub-flow name="ping_check-dependencies" doc:id="566f6bfc-babd-43a2-88a4-8abb60aaad8d" >
+		<scatter-gather doc:name="Check All Dependencies Parallely" doc:id="047343a8-ba5b-4bc8-8320-d7869a91040f" >
+			<route >
+				<flow-ref doc:name="ping_check-dependency-address-validation-system-api" doc:id="3328945c-1914-4b03-bb56-a8908a33b9d0" name="ping_check-dependency-address-validation-system-api" />
+			</route>
+			<route >
+				<flow-ref doc:name="ping_check-dependency-global-data-process-api" doc:id="e9c65330-0cb2-41a2-abb8-822b0a0cb4ac" name="ping_check-dependency-global-data-process-api" />
+			</route>
+		</scatter-gather>
+	</sub-flow>
+	<sub-flow name="ping_check-dependency-global-data-process-api" doc:id="3504117f-d749-491d-a17f-410b18211d56" >
+		<set-variable value="#[p('mdm-customers-sys-api.name')]" doc:name="backendCheckHost" doc:id="c08d27ee-9177-4394-a389-3a8c8c50d6e7" variableName="backendCheckHost" />
+		<try doc:name="Try" doc:id="17d367a5-9548-429e-9d8f-2847e2276301" >
+			<http:request method="GET" doc:name="Invoke Global Data Process API" doc:id="2bf61a9e-cafb-4f40-894d-be65c7640131" config-ref="global-party-prc-api-httpRequestConfig" path="${global-party-prc-api.ping-path}" />
+			<set-variable value="#['UP']" doc:name="backendSystemStatus" doc:id="155b1203-49f7-4401-ac7e-14aa158e97b4" variableName="backendSystemStatus" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="46146e80-23aa-4a56-a0c8-126bb55dc9fe" type="HTTP:METHOD_NOT_ALLOWED" >
+					<set-variable value="#['UP']" doc:name="backendSystemStatus" doc:id="8e55b282-b41b-418a-a001-d00bd07a68c8" variableName="backendSystemStatus" />
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2188b653-ae24-4833-ae4e-a36fdde3ca21" type="HTTP:BAD_GATEWAY, HTTP:CONNECTIVITY" >
+					<set-variable value="#['DOWN']" doc:name="backendSystemStatus" doc:id="5fb5fb23-c99b-48ae-bb9f-aebbb65c6bcb" variableName="backendSystemStatus" />
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="8bf08a78-b5cf-4a01-bdb4-83eece1efc91" type="ANY" >
+					<set-variable value="#['ERROR']" doc:name="backendSystemStatus" doc:id="4c0063e8-266d-4934-ba42-47f952612700" variableName="backendSystemStatus" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Dependency Status Response" doc:id="d8627539-6a9b-4a4d-a145-bba140ded562" >
+			<ee:message >
+				<ee:set-payload resource="dwl/ping-check-dependency-sys-api-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="ping_check-dependency-address-validation-system-api" doc:id="3ab41d27-1bb1-429f-880c-17f9080930ae" >
+		<set-variable value="#[p('address-validation-sys-api.name')]" doc:name="backendCheckHost" doc:id="e4445271-21bb-4ee9-b98c-d73232eb3097" variableName="backendCheckHost" />
+		<try doc:name="Try" doc:id="52a0373e-5dd8-4313-a874-a10f8decb513" >
+			<http:request method="GET" doc:name="Invoke Address Validation System API" doc:id="bc786f4b-6716-44bd-927a-bedc1dc48973" config-ref="address-validation-sys-api-httpRequestConfig" path="${address-validation-sys-api.ping-path}" sendBodyMode="ALWAYS" followRedirects="true"/>
+			<set-variable value="#['UP']" doc:name="backendSystemStatus" doc:id="109af835-d6d8-4dfd-8281-299aba73da1f" variableName="backendSystemStatus" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="33bbe842-828e-4fbe-b0f9-48ee9f78164d" type="HTTP:METHOD_NOT_ALLOWED" >
+					<set-variable value="#['UP']" doc:name="backendSystemStatus" doc:id="8cbb0b43-c015-4b2e-9ccc-fba45fe737f4" variableName="backendSystemStatus" />
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d459a857-057a-4616-905f-27fbfffbec5f" type="HTTP:BAD_GATEWAY, HTTP:CONNECTIVITY" >
+					<set-variable value="#['DOWN']" doc:name="backendSystemStatus" doc:id="57adc249-9b16-46b6-82e8-0ed8ce1cd3fd" variableName="backendSystemStatus" />
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b0d371fd-5317-45ba-b26e-5c633a6fd9a5" type="ANY" >
+					<set-variable value="#['ERROR']" doc:name="backendSystemStatus" doc:id="38126013-b653-490f-9e37-83d1d4a571f0" variableName="backendSystemStatus" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Dependency Status Response" doc:id="c08def15-a8ff-4cac-8f9f-8e089f491bae" >
+			<ee:message >
+				<ee:set-payload resource="dwl/ping-check-dependency-sys-api-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

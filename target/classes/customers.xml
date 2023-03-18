@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="customers_get-externalids" doc:id="f20cb647-5872-41d3-a842-39a527373fea" >
+		<try doc:name="Try" doc:id="92f65bbd-ca84-46df-970e-2f2ec8cefb67" >
+			<http:request method="GET" doc:name="Get External IDs" doc:id="c8a5ea26-5c2d-42c8-ab6d-ad767ab00691" config-ref="global-party-prc-api-httpRequestConfig" path="${global-party-prc-api.getPartyRolesExternalIds}" sendCorrelationId="ALWAYS" correlationId="#[correlationId]" >
+				<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"partyRoleId" : vars.customerId default "invalid"
+}]]]></http:uri-params>
+				<http:query-params ><![CDATA[#[output application/java
+---
+{
+	externalId : vars.customerId
+}]]]></http:query-params>
+			</http:request>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="39eb72f9-27ce-467d-aeba-ff52f59ca67c" type="HTTP:BAD_REQUEST, HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:NOT_FOUND, HTTP:PARSING, HTTP:RETRY_EXHAUSTED, HTTP:SECURITY, HTTP:UNAUTHORIZED, HTTP:UNSUPPORTED_MEDIA_TYPE" >
+					<flow-ref doc:name="common-error-handler_http-exception" doc:id="b2b7e0f1-e8f3-4600-90d9-3a795b082615" name="common-error-handler_http-exception" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Map Response" doc:id="801d7cb4-3a39-4a80-b3dc-e3af9c0b67b9" >
+			<ee:message >
+				<ee:set-payload resource="dwl/map-externalids-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

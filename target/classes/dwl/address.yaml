@@ -1,0 +1,11 @@
+address-validation-sys-api:
+  # Replace with respective application hostname
+  host: "fins-address-validation-system-api.us-e2.cloudhub.io"
+  port: "443"
+  response-timeout: "60000"
+  connection-idle-timeout: "3000"
+  http-frequency: "5000"
+  http-reconnection-attempts: "2" 
+  base-path: "/api"
+  ping-path: "/pings"
+  name: "FINS Address Validation System API"

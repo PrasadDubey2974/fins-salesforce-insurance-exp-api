@@ -1,0 +1,1349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="fins-Salesforce-Insurence-EXP-api-test-suite.xml" />
+	
+	
+<munit:test name="ping-test-SuiteTest-GLOBAL-ADDRESSVALIDATION" doc:id="6ba71f2f-7582-41ca-bcad-b09d3a8cfd17" >
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1042ad5b-2c26-4f82-a912-935e8d32b777" processor="sub-flow">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ping_check-dependency-global-data-process-api" attributeName="name" />
+					<munit-tools:with-attribute whereValue="3504117f-d749-491d-a17f-410b18211d56" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="cc0f2317-ae99-432a-a021-e4ae08254d27" processor="sub-flow">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ping_check-dependency-address-validation-system-api" attributeName="name" />
+					<munit-tools:with-attribute whereValue="3ab41d27-1bb1-429f-880c-17f9080930ae" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="af918ca2-e909-4d64-a694-eea1ece7bde7" >
+				<flow-ref doc:name="ping_get-health" doc:id="4e25f9e8-42e4-4cca-88a0-067d3df22a38" name="ping_check-dependency-address-validation-system-api" />
+				<flow-ref doc:name="Flow Reference" doc:id="774d4b9f-3d57-4da6-b1ce-096838666f58" name="ping_check-dependency-global-data-process-api"/>
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ecb8c675-92bc-4084-b193-148ea756f095" type="ANY">
+						<logger level="INFO" doc:name="Logger" doc:id="12b7fa07-c374-46af-b0aa-ab5d6b787b2c" message="Error"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation>
+			<logger level="INFO" doc:name="Logger" doc:id="b0bdcd3a-4fb7-4630-b974-36fc77622b95" message="flow-done"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="ping-test-suite_GetHealthBadParamTest" doc:id="089d1d6c-3ebd-466f-8355-5c1e7854ba21" description="Get Health Bad Param Test" >
+		<munit:execution >
+			<munit:set-event doc:name="Set Query Param" doc:id="ca1101a6-71ed-48c2-827f-d91fb9fe4bef" >
+				<munit:attributes value='#[{ queryParams: { checkDependencies: "true-ish" }}]' />
+			</munit:set-event>
+			<flow-ref doc:name="get:\ping:payments-simulator-prc-api-config" doc:id="0379b0b2-7c9e-43ce-b00b-18f6f6a44805" name="get:\ping:salesforce-insurance-exp-api-config" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert 200 Response" doc:id="8c56350d-55f3-41b7-9ebd-8775f3e331da" actual="#[vars.httpStatus]" expected="200" message="Expected success response" />
+			<munit-tools:assert-that doc:name="Assert No Dependencies" doc:id="dcd8e1cd-54c3-489f-a9ae-6d95941e3357" expression="#[payload.dependencies]" is="#[MunitTools::nullValue()]" />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="ping-test-suite_GetHealthWithDependenciesTest" doc:id="bd1baa56-8b18-41ea-849a-a8d697b9fd75" description="Get Health With Dependencies Test" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Ping request to Address Validation API" doc:id="f70400be-5e5c-437a-af80-9f8abcee4ded" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ping_check-dependency-address-validation-system-api" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="3328945c-1914-4b03-bb56-a8908a33b9d0" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Ping request to MDM Customers API" doc:id="abf0e3d6-3d8c-4023-8edb-3e63fa49d735" processor="flow-ref" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ping_check-dependency-global-data-process-api" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="e9c65330-0cb2-41a2-abb8-822b0a0cb4ac" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Query Param" doc:id="3439de5c-1731-4cd1-839c-5c9b714e8514" >
+				<munit:attributes value='#[{ queryParams: { checkDependencies: "true" }}]' />
+			</munit:set-event>
+			<flow-ref doc:name="ping_get-health" doc:id="796c22aa-1994-49dc-8762-ce709c6597c1" name="ping_get-health" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert 200 Response" doc:id="d8d52b8d-5c36-4071-9205-832fcbbec105" actual="#[vars.httpStatus]" expected="200" message="Expected success response" />
+			<munit-tools:assert-that doc:name="Assert Has Dependencies" doc:id="8ecd8402-6250-43f3-bcfd-caa31f703c11" expression="#[payload.dependencies]" is="#[MunitTools::notNullValue()]" />
+		</munit:validation>
+	</munit:test>
+	
+	
+
+	
+	<munit:test name="salesforce-insurance-exp-api-Mains-APIKIT:NOT_FOUND" doc:id="d4a2aafd-b459-46e1-956b-6b996007e97e" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when apikit router" doc:id="5acdd2bd-60c4-48fd-8d0b-5b4c4779a75d" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="7a219dd1-302e-40c1-8f81-9a0dee1341a0" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-mains" doc:id="ae440904-b91f-4b02-be1d-8abe46cd7d8f" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5afe55dc-d39c-4daa-905d-4a94a46e0d45" type="ANY">
+						<logger level="INFO" doc:name="Logger" doc:id="d15ee990-a69e-43a9-b788-397c6b8689a9" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:verify-call doc:name="Verify call" doc:id="80f1900b-6db3-4d56-b564-1481e67559bd" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="salesforce-insurance-exp-api-Mains-APIKIT:BAD_REQUEST" doc:id="060df6df-63fd-4d7c-8724-a403c3ec4251" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when apikit router" doc:id="881fd256-a6c2-4bc5-ba41-b2952b76eb88" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="0915fe6a-59e5-4302-b07c-e4b47c18b9dd" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-mains" doc:id="7196439b-2a80-4b7b-81fc-b8e70c8b40fd" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f24f8327-cdf1-448b-b452-e4c69bdc70e3" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="ff69d24c-c528-4a6c-9a1e-2b6a47a54b25" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="ff8667fa-32e6-4844-a21f-8ee3dbf4edca" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="salesforce-insurance-exp-api-Mains-METHOD-NOT-ALLOWED" doc:id="93950f71-c24f-48da-9388-dd0412e5313c" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when apikit router" doc:id="e89a5359-d5fd-43e1-b004-fe826f9cfc53" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="METHOD-NOT-ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="40091dc1-9de8-4eaa-a3cc-21a6ffeaa60d" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-mains" doc:id="e3ba62d5-24aa-48f3-9155-ee448c0f84c1" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b5706a32-b598-454b-b84c-5a1f0ce5cc00" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="3dd93753-56b4-42d3-93d5-4e9efacdc9cb" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="fe21bda6-7c53-4fff-aba3-bf843d0ee04a" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="salesforce-insurance-exp-api-Mains-APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="791b0ab4-6b17-4747-97d9-d205d41b8ee1" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when apikit router" doc:id="a0e45488-9a5d-483e-b036-0357da57faa8" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="d4a8fa2b-d61a-4019-b9c4-9bcd071b327f" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-mains" doc:id="4345bf42-e62b-4ff8-b2ae-b17a001b6114" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3a749552-439c-4c42-b7b1-e23e1960706b" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="77bf2439-646d-4858-9cba-e0e91243bd31" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="405de390-60ce-4b6f-a09d-d1a3e8aaee0f" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="salesforce-insurance-exp-api-Mains-APIKIT:NOT_IMPLEMENTED" doc:id="348c4866-94e3-4d71-8920-babb23dfcd42" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when apikit router" doc:id="99104df5-b0f9-48e4-9ecf-9a96946f7f04" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_IMPLEMENTED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="1d23a02c-a832-4d22-9959-01ca163fd5a8" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-mains" doc:id="90a5b297-de0e-465a-8ded-e2d7d3b6e2f9" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2c1f5b2e-80e7-48e9-823c-e3a98e93e4bc" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="a840edb4-f751-4c9c-8ff3-7023e9ae3468" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="65db6e64-daa4-47d7-8ea0-780fff9b80ea" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="salesforce-insurance-exp-api-Mains-APIKIT:NOT_ACCEPTABLE" doc:id="1cc80e34-965a-4009-a158-bc40fbf67878" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when apikit router" doc:id="d956a2f8-155e-44e5-bd19-6753e9df1fff" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="b1cb0a3e-9285-412b-b00c-37aa8b68ef17" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-mains" doc:id="14981a5c-8c07-4934-8e1f-6e653e57168d" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2a404aa8-8444-46b9-8eb8-fb67a170361d" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="7add917a-e1b9-4c70-b434-fd344970eddb" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="d2aeceb4-de51-4be2-9277-e6c37adbf096" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="salesforce-insurance-exp-api-Mains-ANY" doc:id="57258b91-9f9b-478c-be49-304c45a3b713" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when apikit router" doc:id="31d43a62-33d5-4ebe-b9a8-3d49164d7f4e" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="2afd2b58-f9ee-4996-b3c3-a20eb42fce0f" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-mains" doc:id="b9e8dfb9-7e93-4d30-82bd-80cf54d5fa0a" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e1832b4a-5699-46d9-a256-6fa6ce6ff042" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="875e5539-0324-42a9-b1d8-0f8315cfd43f" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="6c2a43b6-5969-43b8-aabb-9961e20333b5" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="salesforce-insurance-exp-api-Mains-APIKIT:METHOD_NOT_ALLOWED" doc:id="fefbd827-8861-46ba-bc2d-6bc9e7ad8210" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when apikit router" doc:id="350a039c-b48c-45b8-b023-652dfa01516d" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="6b8ee8e1-10b6-499b-aadc-2167b7203770" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-mains" doc:id="f8e73958-57a6-4721-952e-b8d3b5634c9d" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a738f42a-843b-47c7-a298-b92b4a5c5e34" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="006a6590-3d36-472c-a8aa-e4b82938c1cc" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="c6e4e235-6d6a-4000-9a54-c9a191518385" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="payments-simulator-prc-api-test-suiteTest-http-Exception" doc:id="efc222ba-7cb3-4741-901b-0531a4fa9d3c" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="680621ad-e5e7-4055-a1ec-7fe962fd2fdd" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="7f4dfb7e-798f-4a69-9a10-20c8ec86e2d6" >
+				<flow-ref doc:name="salesforce-insurance-exp-api-main" doc:id="7632d2a1-2596-46a0-9075-8bcf0d92cf62" name="salesforce-insurance-exp-api-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="bbcf9c15-ffe4-462a-9996-e697bc55589b" type="ANY" >
+						<flow-ref doc:name="common-error-handler_http-exception" doc:id="ee681723-3290-4d47-af53-399ec35e75c4" name="common-error-handler_http-exception" />
+						<flow-ref doc:name="common-error-handler_connector-exception" doc:id="22b6f155-57ed-4be2-a786-ab32f656edc6" name="common-error-handler_connector-exception" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="5fbd7b13-455e-498b-a555-68947bef917d" processor="apikit:router" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	
+		<munit:test name="get:\contacts\(contactId)\externalIds:salesforce-insurance-exp-api-Config-test" doc:id="c3d9a81f-003e-4505-90a8-a8c7fd4dfacf" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="1851a9f7-dc1c-4b2f-bc9d-9485d12652fd" >
+				<munit:payload value="#[readUrl('classpath://contactsgetIdexternalIdstest/set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://contactsgetIdexternalIdstest/set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://contactsgetIdexternalIdstest/set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="Mock GlobalDataAPI Customers" doc:id="2115ff22-de82-4b78-b669-4e2a48de8b1b" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Get External IDs" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="global-party-prc-api-httpRequestConfig" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://contactsgetIdexternalIdstest/mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\contacts\(contactId)\externalIds:salesforce-insurance-exp-api-config" doc:id="c561173a-dbe3-47b0-8768-f551ec923f27" name="get:\contacts\(contactId)\externalIds:salesforce-insurance-exp-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="92be9af4-0ab9-43b6-9f71-91e47a8ce745" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import contactsgetIdexternalIdstest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="get:\contacts\(contactId)\externalIds:salesforce-insurance-exp-api-Config-BaD-request" doc:id="2afc696f-523a-4b42-bade-aefd217f281d" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="5488a9f1-35dd-4cd7-952e-7cab868f1e47" processor="sub-flow">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="contacts_get-externalids" attributeName="name" />
+					<munit-tools:with-attribute whereValue="7a8a01d5-5844-41e7-b557-657e138a7959" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="41caee19-d3ef-432b-8854-8a8717d0ef56" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-contact-ID.dwl')]" />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="b251e1ad-058c-4753-a227-a9b885d75644" >
+				<flow-ref doc:name="get:\contacts\(contactId)\externalIds:salesforce-insurance-exp-api-config" doc:id="9786355d-d3ec-44a3-b386-559cddb417e1" name="get:\contacts\(contactId)\externalIds:salesforce-insurance-exp-api-config" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1c474121-b6ed-4089-9384-d348e0c5c637" type="ANY">
+						<logger level="INFO" doc:name="Logger" doc:id="f5c5d2b9-5b6c-437c-a001-52808986152f" message="Error"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation>
+			<logger level="INFO" doc:name="Logger" doc:id="95e63bdb-60c9-4ea4-9852-063788594c37" message="get:\contacts\(contactId)\externalIds---Done"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="Customers_get-externalids-test" doc:id="d2bbf8c2-e632-4280-a0d4-b9feb26fec3b" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Get External IDs" doc:id="90f9ce87-ec5a-4b94-be1c-bba88ce45763" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Get External IDs" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="c8a5ea26-5c2d-42c8-ab6d-ad767ab00691" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://customersgetexternalidstest/mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://customersgetexternalidstest/mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://customersgetexternalidstest/mock_variable_.dwl')]" />
+						<munit-tools:variable key="customerId" value="#[output application/java --- readUrl('classpath://customersgetexternalidstest/mock_variable_1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="e18d8250-5de6-4440-873f-ee2cbdd8251a" >
+				<munit:payload value="#[readUrl('classpath://customersgetexternalidstest/set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://customersgetexternalidstest/set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://customersgetexternalidstest/set-event_variable_.dwl')]" />
+					<munit:variable key="customerId" value="#[output application/java --- readUrl('classpath://customersgetexternalidstest/set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/java" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to customers_get-externalids" doc:id="6286549c-c19a-48d1-bcfe-ca039f5dbb87" name="customers_get-externalids"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="4fca30f2-23b0-4e37-9705-74b556964617" message="Expected that payload should match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import customersgetexternalidstest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="get:\customers\(customerId)\externalIds:salesforce-insurance-exp-api-Config-BaD-Request" doc:id="aef02938-2477-4fa9-9e42-7fa04680ed27" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="30c4546f-3a56-4775-80da-7fbfbdd0b6ba" processor="sub-flow" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="customers_get-externalids" attributeName="name" />
+					<munit-tools:with-attribute whereValue="f20cb647-5872-41d3-a842-39a527373fea" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="f1d6db28-9747-4fe7-a6a7-7de0e16b45d9" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-contact-ID.dwl')]" />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="dedd7400-d892-4259-a6c9-e9ff699907d5" >
+				<flow-ref doc:name="get:\customers\(customerId)\externalIds:salesforce-insurance-exp-api-config" doc:id="5b2d9f67-d37a-448a-b88f-f8a67d8cb1b5" name="get:\customers\(customerId)\externalIds:salesforce-insurance-exp-api-config" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0a0bc5ce-e297-45da-9397-ea2983a92edd" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="1d754eb8-9746-44d3-8801-3594d3b6dcc6" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="Logger" doc:id="0cde7c1e-77e3-4992-a5df-701dcf4e5e3f" message="get:\customers\(customerId)\externalIds---Done" />
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="validators_validate-addresses-success-Test" doc:id="3409275d-4361-4920-81ad-953077af51f8" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Post Address Validation" doc:id="d7a8ed49-27f8-4451-953e-73617b6e6026" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f72ea1c0-b9db-4a61-9509-95de953ac34a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/json --- readUrl('classpath://customersvalidateaddressestest/mock_payload.dwl')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://customersvalidateaddressestest/mock_attributes.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://customersvalidateaddressestest/mock_variable_.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="5b26b842-a00c-4e65-be28-4b15b12a6144" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://customersvalidateaddressestest/set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://customersvalidateaddressestest/set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://customersvalidateaddressestest/set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to validators_validate-postal_addresses" doc:id="2cab8ef6-d758-4c4a-a0a5-36841f0cdc99" name="validators_validate-postal_addresses"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="a125193e-a53c-43f3-9ee7-f38b8a1e2cff" actual="#[payload.isValid]" expected="#[true]" message="Expected address is valid"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="validators_validate-addresses-failed-Test" doc:id="b2437d77-1de7-45e0-a325-a2791f45fae9" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="e009e5fe-44bf-42aa-b537-85757b67ff0e" processor="sub-flow" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="validators_validate-postal_addresses" attributeName="name" />
+					<munit-tools:with-attribute whereValue="3f7f7f80-66dd-4ddf-af8d-e24ec26f1c5e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="f21f0089-a1d4-47e9-a3f9-9a49e0b312cd" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-contact-ID.dwl')]" />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="d18af571-90f3-427e-830e-c1886a5f88d6" >
+				<flow-ref doc:name="post:\validators\postalAddresses:application\json:salesforce-insurance-exp-api-config" doc:id="c3c8ad5c-3080-42fe-a18a-9798d9904ea6" name="post:\validators\postalAddresses:application\json:salesforce-insurance-exp-api-config" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e1875845-f062-4492-b2d4-1fb8207ecc61" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="757ddcd7-94e9-4762-a0bc-14ff9356bdc1" message="Error" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<logger level="INFO" doc:name="Logger" doc:id="d2cb7360-592a-4a26-8c14-3b88d3e885b2" message="get:\customers\(customerId)\externalIds---Done" />
+		</munit:validation>
+	</munit:test>
+
+	<munit:test name="salesforce-insurance-exp-api-Console" doc:id="750b80fd-b480-4cfa-8182-6e1f4cbf509e" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="19818c3f-235d-4236-a96e-42f29288fb9e" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="salesforce-insurance-exp-api-console" doc:id="7ae1cf3b-1dd1-41bb-a96c-0bf441b7e5d1" name="salesforce-insurance-exp-api-console"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call" doc:id="944040b9-2540-4840-9af9-f0bd94c0767c" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="salesforce-insurance-exp-api-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	
+	
+	<munit:test name="ping_Check-dependency-address-validation-system-Api-ANY" doc:id="629c83da-9629-4bcc-b5f8-0784287ccfe5" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="907aa1a3-2018-447b-a117-ebf62531e148" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Invoke Address Validation System API" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="bc786f4b-6716-44bd-927a-bedc1dc48973" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="address-validation-sys-api-httpRequestConfig" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="${address-validation-sys-api.ping-path}" attributeName="path" />
+					<munit-tools:with-attribute whereValue="ALWAYS" attributeName="sendBodyMode" />
+					<munit-tools:with-attribute whereValue="true" attributeName="followRedirects" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="b79c841d-d8e1-4530-82f5-1f1f1a9d53b9" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value="#[readUrl('classpath://dwl/address.yaml')]" encoding="UTF-8" mediaType="application/yaml" />
+				<munit:attributes value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="665d8f24-ccb4-4e22-b545-9e80160b1863" >
+				<flow-ref doc:name="ping_check-dependency-address-validation-system-api-ANY" doc:id="888b19e1-7bbd-4606-8130-daa8ed589311" name="ping_check-dependency-address-validation-system-api" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e1037ee0-a0de-4810-9cf4-ecad3cbf2668" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="7d42bc26-9359-409e-9b3e-5bb2ca469045" message="Error Occured" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ee3c8d51-58f9-4a03-a130-09b421e014b7" is="#[MunitTools::notNullValue()]" expression='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="ping-Check-dependency-address-validation-system-api-HTTP:METHOD_NOT_ALLOWED" doc:id="7d7d174d-bb98-4c7f-b342-94ebc0b653e5" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="309ab304-df3f-4f75-9a87-513b57f146b9" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Invoke Address Validation System API" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="bc786f4b-6716-44bd-927a-bedc1dc48973" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="address-validation-sys-api-httpRequestConfig" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="${address-validation-sys-api.ping-path}" attributeName="path" />
+					<munit-tools:with-attribute whereValue="ALWAYS" attributeName="sendBodyMode" />
+					<munit-tools:with-attribute whereValue="true" attributeName="followRedirects" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+					<munit-tools:error typeId="HTTP:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="1267065a-63fa-4be8-a4ce-dfdfb008fea5" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value="#[readUrl('classpath://dwl/address.yaml')]" encoding="UTF-8" mediaType="application/yaml" />
+				<munit:attributes value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="ecacd83c-3927-40e2-b88e-240860cc49c3" >
+				<flow-ref doc:name="ping_check-dependency-address-validation-system-api" doc:id="3efa467b-9927-4662-b6ca-0ca675d045ec" name="ping_check-dependency-address-validation-system-api" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2eeb5c83-81a3-45d1-8c2d-70aa4eca70fd" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="22de1011-6e89-4736-a6e0-915a7d13ae85" message="Error Occured" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="785d2cbf-040f-4670-a22f-31b02e6dca6e" is="#[MunitTools::notNullValue()]" expression='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="ping_Check-dependency-address-validation-system-api-HTTP:BAD_GATEWAY" doc:id="29b0bce2-3f1a-48b3-9a2f-940249d668fb" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f9c6ae4f-4d64-4c0e-8264-c8e8194c62b1" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Invoke Address Validation System API" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="bc786f4b-6716-44bd-927a-bedc1dc48973" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="address-validation-sys-api-httpRequestConfig" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="${address-validation-sys-api.ping-path}" attributeName="path" />
+					<munit-tools:with-attribute whereValue="ALWAYS" attributeName="sendBodyMode" />
+					<munit-tools:with-attribute whereValue="true" attributeName="followRedirects" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+					<munit-tools:error typeId="HTTP:BAD_GATEWAY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="2ab55b8e-f148-414c-af5f-2e55bac648d4" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value="#[readUrl('classpath://dwl/address.yaml')]" encoding="UTF-8" mediaType="application/yaml" />
+				<munit:attributes value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="e56ac446-7f3f-4252-a9b8-3f0dc6bba0d7" >
+				<flow-ref doc:name="ping_check-dependency-address-validation-system-api-" doc:id="b86983a7-472c-494e-8d65-117cab70d60d" name="ping_check-dependency-address-validation-system-api" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c8cc12f4-f087-4246-a1f4-9fa778119bb1" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="0f86819b-8bbf-4cd0-8437-429f223a9014" message="Error Occured" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="d252d18e-46f5-4c0e-b1da-13ec7d71ebf1" is="#[MunitTools::notNullValue()]" expression='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+		</munit:validation>
+	</munit:test>
+	
+	
+	<munit:test name="ping_Check-dependency-global-data-process-api-ANY" doc:id="46124343-2d2f-4f5a-aa74-5df582cc8e00" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="f52ff6a1-8ea8-4c1a-8381-9f42a825de1e" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Invoke Global Data Process API" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="2bf61a9e-cafb-4f40-894d-be65c7640131" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="global-party-prc-api-httpRequestConfig" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="${global-party-prc-api.ping-path}" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+					<munit-tools:error typeId="ANY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="d5c59798-311a-41eb-8738-d52cc1477652" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value="#[readUrl('classpath://dwl/address.yaml')]" encoding="UTF-8" mediaType="application/yaml" />
+				<munit:attributes value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="8e6e6bb7-c119-47cf-99c3-8a96c36b1b18" >
+				<flow-ref doc:name="ping_check-dependency-global-data-process-api" doc:id="5117806e-520d-44c9-962d-46e57ce0ef41" name="ping_check-dependency-global-data-process-api" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0a6876a3-502d-402c-ba52-17bc67133245" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="b39bf9bf-2a05-4362-9578-6d54db5ac566" message="Error Occured" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="6ced277d-ffe4-4497-a8f4-0076a922a23c" is="#[MunitTools::notNullValue()]" expression='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="ping_Check-dependency-global-data-process-api-HTTP:BAD_GATEWAY" doc:id="ebfc0327-10ad-41a8-b94a-69cb6ecd8fe2" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9db02baf-fbb9-4827-922a-2160fe7fd15c" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Invoke Global Data Process API" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="2bf61a9e-cafb-4f40-894d-be65c7640131" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="global-party-prc-api-httpRequestConfig" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="${global-party-prc-api.ping-path}" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+					<munit-tools:error typeId="HTTP:BAD_GATEWAY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="48a8676a-9339-424a-bbfc-ff55223e354e" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value="#[readUrl('classpath://dwl/address.yaml')]" encoding="UTF-8" mediaType="application/yaml" />
+				<munit:attributes value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="99a4f0ca-fa7b-430e-b163-15f615c5ebfa" >
+				<flow-ref doc:name="ping_check-dependency-global-data-process-api" doc:id="1d3f8041-362b-419e-8246-ce713c276a9e" name="ping_check-dependency-global-data-process-api" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ddc7400c-c132-4dc5-a7f0-3abd34e4b5e3" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="5a8f0298-be1e-45e9-8ffc-04d7d78e07f7" message="Error Occured" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="c4c8e8ef-3464-412a-b074-98c40be44b02" is="#[MunitTools::notNullValue()]" expression='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="ping_Check-dependency-global-data-process-api-HTTP:METHOD_NOT_ALLOWED" doc:id="db215774-55cd-42db-8e92-3f723172edf3" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="18ca6ceb-10fc-43e6-a998-495cda9a8c4b" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					<munit-tools:with-attribute whereValue="Invoke Global Data Process API" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="2bf61a9e-cafb-4f40-894d-be65c7640131" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="global-party-prc-api-httpRequestConfig" attributeName="config-ref" />
+					<munit-tools:with-attribute whereValue="${global-party-prc-api.ping-path}" attributeName="path" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+					<munit-tools:error typeId="HTTP:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="f4cbbe71-8bd0-4752-822d-710d6da04883" >
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:payload value="#[readUrl('classpath://dwl/address.yaml')]" encoding="UTF-8" mediaType="application/yaml" />
+				<munit:attributes value="#[readUrl('classpath://dwl/setevent-for-address.dwl')]" />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+				<munit:attributes value='#[{&#10;	"uriParams":{&#10;		"postalCode": 111111&#10;		}&#10;}]' />
+			</munit:set-event>
+			<try doc:name="Try" doc:id="b607b2ac-32d2-4b0a-947b-0a3a06a99cb6" >
+				<flow-ref doc:name="ping_check-dependency-global-data-process-api" doc:id="465ab6ee-232e-4731-b909-cc0b2a3b57af" name="ping_check-dependency-global-data-process-api" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b5b69ecc-9fa8-4462-8411-80577359eca4" type="ANY" >
+						<logger level="INFO" doc:name="Logger" doc:id="4493db70-8786-42c2-9565-7a364aa797e6" message="Error Occured" />
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="302eef70-85c8-4685-b2d7-5bdf0d77a4dc" is="#[MunitTools::notNullValue()]" expression='#[{&#10;    "errorCode": "NOT_FOUND",&#10;    "errorMessage": "/pings",&#10;    "transactionId": "cc00c080-c2f9-11ed-a2e4-06630dae34a8",&#10;    "timeStamp": "2023-03-15T06:22:44.376Z",&#10;    "causedBy": null&#10;}]' />
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

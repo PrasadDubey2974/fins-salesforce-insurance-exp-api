@@ -1,0 +1,35 @@
+# Replace with respective API autodiscoveryID
+api:
+  autodiscoveryID: "00000000"
+  
+# Listener configuration
+https:
+  host: "0.0.0.0"
+  port: "8081"
+  
+# Global Party Process API configuration
+global-party-prc-api:
+  # Replace with respective application hostname
+  host: "accelerator-global-party-process-api.us-e2.cloudhub.io"
+  port: "443"
+  base-path: "/api"
+  ping-path: "/ping"
+  getPartyRolesExternalIds: "/partyRoles/{partyRoleId}/externalIds"
+  getPartyExternalIds: "/parties/{partyId}/externalIds"
+  response-timeout: "60000"
+  connection-idle-timeout: "3000"
+  http-frequency: "5000"
+  http-reconnection-attempts: "2"
+  
+# Address Validation System API configuration  
+address-validation-sys-api:
+  # Replace with respective application hostname
+  host: "fins-address-validation-system-api.us-e2.cloudhub.io"
+  port: "443"
+  response-timeout: "60000"
+  connection-idle-timeout: "3000"
+  http-frequency: "5000"
+  http-reconnection-attempts: "2" 
+  base-path: "/api"
+  ping-path: "/ping"
+  name: "FINS Address Validation System API"

@@ -1,0 +1,628 @@
+{
+	"info": {
+		"_postman_id": "e61f9c63-feae-4458-8401-1236782d226d",
+		"name": "fins-salesforce-insurance-exp-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Query Health",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/ping",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"ping"
+							]
+						},
+						"description": "Call ping operation with no parameters"
+					},
+					"response": []
+				},
+				{
+					"name": "Query Health with Dependencies",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/ping?checkDependencies=true",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"ping"
+							],
+							"query": [
+								{
+									"key": "checkDependencies",
+									"value": "true",
+									"description": "Include health of dependencies"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Query Health with Invalid Parameter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/ping?checkDependencies=true-ish",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"ping"
+							],
+							"query": [
+								{
+									"key": "checkDependencies",
+									"value": "true-ish",
+									"description": "Should not return dependencies"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Validators",
+			"item": [
+				{
+					"name": "Post Validators Postal Address - US Address",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contactPointType\": [\n        \"ContactPointAddress\"\n    ],\n    \"id\": null,\n    \"activeFromDate\": \"2020-03-05\",\n    \"forBusinessUse\": false,\n    \"geoAccuracy\": 659,\n    \"profileLastUpdatedDate\": \"2022-01-01\",\n    \"isUsedForShipping\": true,\n    \"isUsedForBilling\": false,\n    \"name\": \"Home\",\n    \"primaryFlag\": true,\n    \"cityName\": \"San Francisco\",\n    \"bestTimeToContactEndTime\": \"00:01:01\",\n    \"bestTimeToContactStartTime\": \"00:01:01\",\n    \"addressLine1\": \"415 Mission Street\",\n    \"addressLine2\": \"3rd Floor\",\n    \"profileOccurrenceCount\": 677,\n    \"profileFirstCreatedDate\": \"2022-01-01\",\n    \"activeToDate\": \"2024-10-01\",\n    \"stateProvinceName\": \"CA\",\n    \"countryName\": \"USA\",\n    \"postalCodeText\": \"94105\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/validators/postalAddresses",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"validators",
+								"postalAddresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Validators Postal Address - Non US Address Fail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contactPointType\": [\n        \"ContactPointAddress\"\n    ],\n    \"id\": null,\n    \"activeFromDate\": \"2020-03-05\",\n    \"forBusinessUse\": false,\n    \"geoAccuracy\": 659,\n    \"profileLastUpdatedDate\": \"2022-01-01\",\n    \"isUsedForShipping\": true,\n    \"isUsedForBilling\": false,\n    \"name\": \"Home\",\n    \"primaryFlag\": true,\n    \"cityName\": \"Toronto\",\n    \"bestTimeToContactEndTime\": \"00:01:01\",\n    \"bestTimeToContactStartTime\": \"00:01:01\",\n    \"addressLine1\": \"10 Bay Street\",\n    \"addressLine2\": \"Suite 400\",\n    \"profileOccurrenceCount\": 677,\n    \"profileFirstCreatedDate\": \"2022-01-01\",\n    \"activeToDate\": \"2024-10-01\",\n    \"stateProvinceName\": \"ON\",\n    \"countryName\": \"Canada\",\n    \"postalCodeText\": \"M5J 2R8\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/validators/postalAddresses",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"validators",
+								"postalAddresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Validators Postal Address - Address Not Found",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contactPointType\": [\n        \"ContactPointAddress\"\n    ],\n    \"id\": null,\n    \"activeFromDate\": \"2020-03-05\",\n    \"forBusinessUse\": false,\n    \"geoAccuracy\": 659,\n    \"profileLastUpdatedDate\": \"2022-01-01\",\n    \"isUsedForShipping\": true,\n    \"isUsedForBilling\": false,\n    \"name\": \"Home\",\n    \"primaryFlag\": true,\n    \"cityName\": \"San Diego\",\n    \"bestTimeToContactEndTime\": \"00:01:01\",\n    \"bestTimeToContactStartTime\": \"00:01:01\",\n    \"addressLine1\": \"{{$randomStreetAddress}}\",\n    \"profileOccurrenceCount\": 677,\n    \"profileFirstCreatedDate\": \"2022-01-01\",\n    \"activeToDate\": \"1976-10-01\",\n    \"stateProvinceName\": \"CA\",\n    \"countryName\": \"USA\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/validators/postalAddresses",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"validators",
+								"postalAddresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Validators Postal Address - Invalid City",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contactPointType\": [\n        \"ContactPointAddress\"\n    ],\n    \"id\": null,\n    \"activeFromDate\": \"2020-03-05\",\n    \"forBusinessUse\": false,\n    \"geoAccuracy\": 659,\n    \"profileLastUpdatedDate\": \"2022-01-01\",\n    \"isUsedForShipping\": true,\n    \"isUsedForBilling\": false,\n    \"name\": \"Home\",\n    \"primaryFlag\": true,\n    \"cityName\": \"XYZ\",\n    \"bestTimeToContactEndTime\": \"00:01:01\",\n    \"bestTimeToContactStartTime\": \"00:01:01\",\n    \"addressLine1\": \"{{$randomStreetAddress}}\",\n    \"addressLine2\": \"Unit 23\",\n    \"profileOccurrenceCount\": 677,\n    \"profileFirstCreatedDate\": \"2022-01-01\",\n    \"activeToDate\": \"1976-10-01\",\n    \"stateProvinceName\": \"TX\",\n    \"countryName\": \"USA\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/validators/postalAddresses",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"validators",
+								"postalAddresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Validators Postal Address  - Invalid State Code",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contactPointType\": [\n        \"ContactPointAddress\"\n    ],\n    \"id\": null,\n    \"activeFromDate\": \"2020-03-05\",\n    \"forBusinessUse\": false,\n    \"geoAccuracy\": 659,\n    \"profileLastUpdatedDate\": \"2022-01-01\",\n    \"isUsedForShipping\": true,\n    \"isUsedForBilling\": false,\n    \"name\": \"Home\",\n    \"primaryFlag\": true,\n    \"cityName\": \"{{$randomCity}}\",\n    \"bestTimeToContactEndTime\": \"00:01:01\",\n    \"bestTimeToContactStartTime\": \"00:01:01\",\n    \"addressLine1\": \"{{$randomStreetAddress}}\",\n    \"addressLine2\": \"Unit 23\",\n    \"profileOccurrenceCount\": 677,\n    \"profileFirstCreatedDate\": \"2022-01-01\",\n    \"activeToDate\": \"1976-10-01\",\n    \"stateProvinceName\": \"TM\",\n    \"countryName\": \"USA\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/validators/postalAddresses",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"validators",
+								"postalAddresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Validators Postal Address - Invalid Zip",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"contactPointType\": [\n        \"ContactPointAddress\"\n    ],\n    \"id\": null,\n    \"activeFromDate\": \"2020-03-05\",\n    \"forBusinessUse\": false,\n    \"geoAccuracy\": 659,\n    \"profileLastUpdatedDate\": \"2022-01-01\",\n    \"isUsedForShipping\": true,\n    \"isUsedForBilling\": false,\n    \"name\": \"Home\",\n    \"primaryFlag\": true,\n    \"cityName\": \"{{$randomCity}}\",\n    \"bestTimeToContactEndTime\": \"00:01:01\",\n    \"bestTimeToContactStartTime\": \"00:01:01\",\n    \"addressLine1\": \"{{$randomStreetAddress}}\",\n    \"addressLine2\": \"Unit 23\",\n    \"profileOccurrenceCount\": 677,\n    \"profileFirstCreatedDate\": \"2022-01-01\",\n    \"activeToDate\": \"1976-10-01\",\n    \"stateProvinceName\": \"TX\",\n    \"countryName\": \"USA\",\n    \"postalCodeText\": \"12100\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/validators/postalAddresses",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"validators",
+								"postalAddresses"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "Test Data",
+					"item": [
+						{
+							"name": "Publish Contact (Individual) - With No Source System",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"let internalHeaderValue = pm.response.headers.get('Location').split('/customers/')[1];",
+											"console.log(\"customerId \" + internalHeaderValue);",
+											"    pm.collectionVariables.set(\"customerId\",internalHeaderValue);",
+											"    pm.variables.set(\"customerId\",internalHeaderValue);",
+											"    pm.response.to.have.status(200);",
+											"    });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\n    {\n        \"id\": null,\n        \"partyRoleType\": \"Customer\",\n        \"party\": [\n            {\n                \"id\": null,\n                \"partyType\": \"Individual\",\n                \"salutation\": \"{{$randomNamePrefix}}\",\n                \"personName\": \"{{$randomFullName}}\",\n                \"contactPoints\": [\n                    {\n                        \"contactPointType\": [\n                            \"ContactPointAddress\"\n                        ],\n                        \"id\": null,\n                        \"activeFromDate\": \"2021-11-09\",\n                        \"addressLine1\": \"{{$randomStreetName}}\",\n                        \"cityName\": \"{{$randomCity}}\",\n                        \"postalCodeText\": \"32145\",\n                        \"stateProvinceName\": \"TX\",\n                        \"countryName\": \"USA\",\n                        \"geoLatitude\": null,\n                        \"geoLongitude\": null,\n                        \"geoAccuracy\": null\n                    },\n                    {\n                        \"contactPointType\": [\n                            \"ContactPointEmail\"\n                        ],\n                        \"id\": null,\n                        \"activeFromDate\": \"2015-03-15\",\n                        \"bestTimeToContactEndTime\": \"00:01:01\",\n                        \"bestTimeToContactStartTime\": \"00:01:01\",\n                        \"isUsedForShipping\": true,\n                        \"activeToDate\": \"1976-10-01\",\n                        \"emailAddress\": \"testuser{{$timestamp}}@example.com\",\n                        \"emailBouncedReason\": \"test bounce\",\n                        \"emailDomain\": \"{{$randomDomainName}}\",\n                        \"emailMailBox\": \"inbox\",\n                        \"forBusinessUse\": true,\n                        \"forPersonalUse\": true,\n                        \"primaryFlag\": true,\n                        \"name\": \"Personal\",\n                        \"profileOccurrenceCount\": 1\n                    }\n                ]\n            }\n        ],\n        \"customerNumber\": \"123-4100-65\",\n        \"customerStatus\": \"ACTIVE\",\n        \"auditInfo\": {\n            \"createdDate\": \"2021-08-25T20:26:30Z\",\n            \"createdBy\": \"0055e000003hOx4AAE\",\n            \"updatedDate\": \"2021-11-09T19:27:51Z\",\n            \"updatedBy\": \"0055e000003fNkkAAE\",\n            \"isDeleted\": false\n        }\n    }\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{host_customers_prc_api}}/api/customers",
+									"protocol": "https",
+									"host": [
+										"{{host_customers_prc_api}}"
+									],
+									"path": [
+										"api",
+										"customers"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Customer ExternalIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/customers/:customerId/externalIds",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								":customerId",
+								"externalIds"
+							],
+							"variable": [
+								{
+									"key": "customerId",
+									"value": "{{customerId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Contacts",
+			"item": [
+				{
+					"name": "Test Data",
+					"item": [
+						{
+							"name": "Publish Customer (Individual) - With No Source System",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"let internalHeaderValue = pm.response.headers.get('Location').split('/individuals/')[1];",
+											"console.log(\"individualId \" + internalHeaderValue);",
+											"    pm.collectionVariables.set(\"individualId\",internalHeaderValue);",
+											"    pm.variables.set(\"individualId\",internalHeaderValue);",
+											"    pm.response.to.have.status(200);",
+											"    });"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[{\n    \"id\": null,\n    \"partyType\": \"Individual\",\n    \"salutation\": \"{{$randomNamePrefix}}\",\n    \"firstName\": \"{{$randomFirstName}}\",\n    \"personName\": \"{{$randomFirstName}}\",\n    \"birthDate\": \"1988-01-12\",\n    \"lastName\": \"{{$randomLastName}}\",\n    \"contactPoints\": [\n        {\n            \"contactPointType\": [\n                \"ContactPointPhone\"\n            ],\n            \"id\": null,\n            \"activeFromDate\": \"2015-03-15\",\n            \"telephoneNumber\": \"{{$randomPhoneNumber}}\",\n            \"extensionNumber\": \"22444\",\n            \"formattedE164PhoneNumber\": \"+1 {{$randomPhoneNumber}}\",\n            \"formattedInternationalPhoneNumber\": \"001 {{$randomPhoneNumber}}\"\n        },\n        {\n            \"contactPointType\": [\n                \"ContactPointEmail\"\n            ],\n            \"id\": null,\n            \"activeFromDate\": \"2015-03-15\",\n            \"emailAddress\": \"testuser{{$timestamp}}@example.com\",\n            \"emailBouncedReason\": \"test bounce\",\n            \"emailDomain\": \"{{$randomDomainName}}\",\n            \"emailMailBox\": \"spam\"\n        },\n        {\n            \"contactPointType\": [\n                \"ContactPointAddress\"\n            ],\n            \"id\": null,\n            \"activeFromDate\": \"2020-03-05\",\n            \"geoLongitude\": {{$randomLongitude}},\n            \"geoLatitude\": {{$randomLatitude}},\n            \"cityName\": \"{{$randomCity}}\",\n            \"addressLine1\": \"{{$randomStreetName}}\",\n            \"stateProvinceName\": \"TX\",\n            \"addressLine4\": \"{{$randomCity}}\",\n            \"countryName\": \"USA\"\n        }\n    ]\n}]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{host_customers_prc_api}}/api/individuals",
+									"protocol": "https",
+									"host": [
+										"{{host_customers_prc_api}}"
+									],
+									"path": [
+										"api",
+										"individuals"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get Contact ExternalIds",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://{{salesforce_insurance_exp_api}}/api/contacts/:contactId/externalIds",
+							"protocol": "https",
+							"host": [
+								"{{salesforce_insurance_exp_api}}"
+							],
+							"path": [
+								"api",
+								"contacts",
+								":contactId",
+								"externalIds"
+							],
+							"variable": [
+								{
+									"key": "contactId",
+									"value": "{{individualId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{accelerator_app_client_secret}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{accelerator_app_client_id}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "customerId",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "salesforce_insurance_exp_api",
+			"value": "fins-salesforce-insurance-exp-api-v1-dev.ca-c1.cloudhub.io",
+			"type": "default"
+		},
+		{
+			"key": "host_customers_prc_api",
+			"value": "fins-customers-prc-api-v3-dev.ca-c1.cloudhub.io",
+			"type": "default"
+		},
+		{
+			"key": "individualId",
+			"value": ""
+		}
+	]
+}

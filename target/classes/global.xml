@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:accelerator-banking="http://www.mulesoft.org/schema/mule/accelerator-banking" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd  http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd  http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/accelerator-banking http://www.mulesoft.org/schema/mule/accelerator-banking/current/mule-accelerator-banking.xsd">
+    <global-property doc:name="global-property-mule.env" doc:id="5c2b8274-6ce1-448e-911c-c1cb9380cc74" name="mule.env" value="local" />
+    <global-property doc:name="global-property-mule.key" doc:id="632b3e28-0a3e-41b6-880e-c39997aafdde" name="mule.key" value="Salesforce123456" />
+    <http:listener-config name="salesforce-insurance-exp-api-httpListenerConfig">
+        <http:listener-connection host="${https.host}" port="${https.port}" protocol="HTTPS" tlsContext="common-selfsigned_tlsContext" />
+    </http:listener-config>
+    <apikit:config name="salesforce-insurance-exp-api-config" api="resource::org.mule.examples:fins-salesforce-insurance-exp-api-spec:1.4.3:raml:zip:fins-salesforce-insurance-exp-api-spec.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <accelerator-banking:config name="accelerator-banking-config" doc:name="Accelerator Banking Config" doc:id="201ee21b-39d7-4aaf-a9f6-193c5e7c992b" apiName="${api.name}" apiVersion="${api.version}" />
+    <import doc:name="import-common-error-handler.xml" doc:id="2dbae224-cd41-4294-9de0-f12fcc922d14" file="common-error-handler.xml" />
+    <import doc:name="import-global-common.xml" doc:id="b8d48d0b-f364-4fa5-9162-f52855d8f69a" file="global-common.xml" />
+    <http:request-config name="global-party-prc-api-httpRequestConfig" doc:name="global-party-prc-api-httpRequestConfiguration" doc:id="dcbd7314-365e-4507-8e11-1126f6b931ed" basePath="${global-party-prc-api.base-path}" responseTimeout="${global-party-prc-api.response-timeout}">
+        <http:request-connection host="${global-party-prc-api.host}" port="${global-party-prc-api.port}" protocol="HTTPS" connectionIdleTimeout="${global-party-prc-api.connection-idle-timeout}">
+            <reconnection>
+                <reconnect frequency="${global-party-prc-api.http-frequency}" count="${global-party-prc-api.http-reconnection-attempts}" />
+            </reconnection>
+        </http:request-connection>
+    </http:request-config>
+    <http:request-config name="address-validation-sys-api-httpRequestConfig" doc:name="address-validation-sys-api-httpRequestConfiguration" doc:id="c7b46a62-bbb3-4157-aae1-129cf03b7f73" basePath="${address-validation-sys-api.base-path}" responseTimeout="${address-validation-sys-api.response-timeout}">
+        <http:request-connection host="${address-validation-sys-api.host}" port="${address-validation-sys-api.port}" protocol="HTTPS" connectionIdleTimeout="${address-validation-sys-api.connection-idle-timeout}">
+            <reconnection>
+                <reconnect frequency="${address-validation-sys-api.http-frequency}" count="${address-validation-sys-api.http-reconnection-attempts}" />
+            </reconnection>
+        </http:request-connection>
+    </http:request-config>
+    <secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="d4f8214c-76f3-4b87-9cdb-c076d840c586" file="config/config-secured-${mule.env}.yaml" key="${mule.key}" />
+    <configuration-properties doc:name="Configuration properties" doc:id="6b6bb9b2-60d2-40a6-9253-e4bf3d013947" file="config/config.yaml" />
+    <configuration-properties doc:name="Configuration properties-env" doc:id="aa7f361b-6fc9-484b-88b9-974a55ddf8f1" file="config/config-${mule.env}.yaml" />
+    <!-- <api-gateway:autodiscovery apiId="${api.autodiscoveryID}" ignoreBasePath="true" 
+		doc:name="API Autodiscovery" doc:id="99974e38-99ca-4e39-8a14-f8451597b96d" 
+		flowRef="mainflow" /> -->
+</mule>

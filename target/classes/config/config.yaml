@@ -1,0 +1,4 @@
+# Common properties shared across all environments
+api:
+  name: "fins-salesforce-insurance-exp-api-1.7.0-mule-application-template"
+  version: "1.3.3"

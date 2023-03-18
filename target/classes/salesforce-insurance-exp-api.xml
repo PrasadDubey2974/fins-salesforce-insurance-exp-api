@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="salesforce-insurance-exp-api-main" doc:id="d49a2b13-2027-492f-8554-d8ab87f854af">
+        <http:listener config-ref="salesforce-insurance-exp-api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="salesforce-insurance-exp-api-config" />
+        <error-handler ref="error-handler_common" />
+    </flow>
+    <flow name="salesforce-insurance-exp-api-console" doc:id="99d77cab-ac49-4f14-b811-9be3e58fb505">
+        <http:listener config-ref="salesforce-insurance-exp-api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="salesforce-insurance-exp-api-config" />
+        <error-handler ref="error-handler_common" />
+    </flow>
+    <flow name="get:\customers\(customerId)\externalIds:salesforce-insurance-exp-api-config" doc:id="d643d669-999f-4246-a18a-10d2157b96bf">
+        <ee:transform doc:name="Set Customer Id" doc:id="240f34c5-98a5-490b-841f-611b26d1d627">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable resource="dwl/setCustomerId.dwl" variableName="customerId" />
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="customers_get-externalids" doc:id="524b59b3-9067-4530-8749-ccd15f838ab1" name="customers_get-externalids" />
+    </flow>
+    <flow name="get:\ping:salesforce-insurance-exp-api-config" doc:id="c39107f2-ab88-4ffe-8229-5f51f82514a9">
+        <flow-ref doc:name="ping_get-health" doc:id="de70d5be-f237-428e-b547-c4b2b3094309" name="ping_get-health" />
+    </flow>
+    <flow name="post:\validators\postalAddresses:application\json:salesforce-insurance-exp-api-config" doc:id="bc907dc6-c66d-42e2-aac9-2648f0fa260f">
+        <flow-ref doc:name="validators_validate-postal_addresses" doc:id="c0f2cb7a-be26-41c7-bc1c-d031f89a58cd" name="validators_validate-postal_addresses" />
+    </flow>
+    <flow name="get:\contacts\(contactId)\externalIds:salesforce-insurance-exp-api-config" doc:id="72e5f12f-7a6c-4871-a080-7956b4fb127d">
+        <ee:transform doc:name="Set Contact Id">
+            <ee:variables>
+                <ee:set-variable variableName="contactId">attributes.uriParams.'contactId'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <flow-ref doc:name="contacts_get-externalids" doc:id="af068805-c91a-4a77-91e2-0cfa4fa954e1" name="contacts_get-externalids" />
+    </flow>
+</mule>

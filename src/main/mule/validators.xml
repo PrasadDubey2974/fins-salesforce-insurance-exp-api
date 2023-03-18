@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="validators_validate-postal_addresses" doc:id="3f7f7f80-66dd-4ddf-af8d-e24ec26f1c5e" >
+		<try doc:name="Try" doc:id="4b93a481-6133-4458-a572-3516eb7faf2c" >
+			<http:request method="POST" doc:name="Post Address Validation" doc:id="f72ea1c0-b9db-4a61-9509-95de953ac34a" config-ref="address-validation-sys-api-httpRequestConfig" path="/validators/postalAddresses" sendCorrelationId="ALWAYS" correlationId="#[correlationId]" >
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"x-correlation-id" : correlationId
+}]]]></http:headers>
+			</http:request>
+			<logger level="INFO" doc:name="Logger" doc:id="5368c736-fdc7-419a-8055-9435d2f9188e" message="#[payload]" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="352e9186-070b-43ff-9b6d-ebda355d9084" type="HTTP:BAD_REQUEST, HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:FORBIDDEN, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:NOT_FOUND, HTTP:PARSING, HTTP:RETRY_EXHAUSTED, HTTP:SECURITY, HTTP:UNAUTHORIZED, HTTP:UNSUPPORTED_MEDIA_TYPE" >
+					<flow-ref doc:name="common-error-handler_http-exception" doc:id="5e2c6d93-659c-482a-9641-3307118c996c" name="common-error-handler_http-exception" />
+				</on-error-propagate>
+			</error-handler>
+		</try>
+	
+</sub-flow>
+</mule>
